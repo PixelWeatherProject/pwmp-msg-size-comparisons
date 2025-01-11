@@ -1,0 +1,13 @@
+[package]
+name = "pwmp-msg-size-comparisons"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bincode = "1.3.3"
+postcard = { version = "1.1.1", default-features = false, features = [
+    "use-std",
+] }
+rmp-serde = "1.3.0"
+pwmp-msg = { git = "ssh://git@github.com/PixelWeatherProject/pwmp-msg.git" }
+serde = { version = "1.0.217", features = ["derive"] }
