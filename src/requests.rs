@@ -1,4 +1,4 @@
-use pwmp_msg::{dec, mac::Mac, request::Request, version::Version, Decimal, Message};
+use pwmp_msg::{mac::Mac, request::Request, version::Version, Message};
 use serde::{de::DeserializeOwned, Serialize};
 use std::{
     fmt::Debug,
@@ -6,27 +6,38 @@ use std::{
 };
 
 fn build_requests() -> Vec<Message> {
-    let hello = Message::Request(Request::Hello {
-        mac: Mac::new(1, 2, 3, 4, 5, 6),
-    });
-    let post_results = Message::Request(Request::PostResults {
-        temperature: dec!(20.44),
-        humidity: 67,
-        air_pressure: Some(u16::MAX),
-    });
-    let post_stats = Message::Request(Request::PostStats {
-        battery: dec!(4.20),
-        wifi_ssid: "ABCDEFGHIJKLMNOPQRSTUVXYZ0123456".into(),
-        wifi_rssi: -85,
-    });
-    let send_notification = Message::Request(Request::SendNotification(
-        "The battery is too low, activating sBOP.".into(),
-    ));
-    let get_settings = Message::Request(Request::GetSettings);
-    let update_check = Message::Request(Request::UpdateCheck(Version::new(1, 0, 1)));
-    let next_update_chunk = Message::Request(Request::NextUpdateChunk(1024));
-    let report_firmware_update = Message::Request(Request::ReportFirmwareUpdate(false));
-    let bye = Message::Request(Request::Bye);
+    let hello = Message::new_request(
+        Request::Handshake {
+            mac: Mac::new(1, 2, 3, 4, 5, 6),
+        },
+        8_716_978,
+    );
+    let post_results = Message::new_request(
+        Request::PostResults {
+            temperature: 20.44,
+            humidity: 67,
+            air_pressure: Some(u16::MAX),
+        },
+        8_716_978,
+    );
+    let post_stats = Message::new_request(
+        Request::PostStats {
+            battery: 4.20,
+            wifi_ssid: "ABCDEFGHIJKLMNOPQRSTUVXYZ0123456".into(),
+            wifi_rssi: -85,
+        },
+        8_716_978,
+    );
+    let send_notification = Message::new_request(
+        Request::SendNotification("The battery is too low, activating sBOP.".into()),
+        8_716_978,
+    );
+    let get_settings = Message::new_request(Request::GetSettings, 8_716_978);
+    let update_check = Message::new_request(Request::UpdateCheck(Version::new(1, 0, 1)), 8_716_978);
+    let next_update_chunk = Message::new_request(Request::NextUpdateChunk(1024), 8_716_978);
+    let report_firmware_update =
+        Message::new_request(Request::ReportFirmwareUpdate(false), 8_716_978);
+    let bye = Message::new_request(Request::Bye, 8_716_978);
 
     let requests = vec![
         hello,
@@ -56,7 +67,9 @@ pub fn serialization() {
     let mut avg_postcard_time = Duration::from_secs(0);
 
     for msg in &requests {
-        let (bincode_size, bincode_time) = benchmark_serialize(msg, bincode::serialize);
+        let (bincode_size, bincode_time) = benchmark_serialize(msg, |val| {
+            bincode::serde::encode_to_vec(val, bincode::config::legacy())
+        });
         avg_bincode_size += bincode_size;
         avg_bincode_time += bincode_time;
 
@@ -111,8 +124,10 @@ pub fn deserialization() {
     let mut avg_postcard_time = Duration::from_secs(0);
 
     for msg in &requests {
-        let raw = bincode::serialize(msg).unwrap();
-        let bincode_time = benchmark_deserialize(&raw, bincode::deserialize::<Message>);
+        let raw = bincode::serde::encode_to_vec(msg, bincode::config::legacy()).unwrap();
+        let bincode_time = benchmark_deserialize(&raw, |raw| {
+            bincode::serde::decode_from_slice::<Message, _>(raw, bincode::config::legacy())
+        });
         avg_bincode_time += bincode_time;
 
         let raw = rmp_serde::to_vec(&msg).unwrap();

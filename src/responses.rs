@@ -6,29 +6,44 @@ use std::{
 };
 
 fn build_responses() -> Vec<Message> {
-    let pong = Message::Response(Response::Pong);
-    let ok = Message::Response(Response::Ok);
-    let reject = Message::Response(Response::Reject);
-    let fw_up_to_date = Message::Response(Response::FirmwareUpToDate);
-    let update_available = Message::Response(Response::UpdateAvailable(Version::new(1, 2, 3)));
-    let update_part = Message::Response(Response::UpdatePart(
-        b"ABCDEFGHIJKLMNOPQRSTUVXYZ0123456"
-            .repeat(1024)
-            .into_boxed_slice(),
-    ));
-    let update_end = Message::Response(Response::UpdateEnd);
-    let settings = Message::Response(Response::Settings(NodeSettings {
-        battery_ignore: false,
-        ota: true,
-        sleep_time: 60,
-        sbop: true,
-        mute_notifications: false,
-    }));
+    let pong = Message::new_response(Response::Pong, 887_412);
+    let ok = Message::new_response(Response::Ok, 887_412);
+    let reject = Message::new_response(Response::Reject, 887_412);
+    let invalid_request = Message::new_response(Response::InvalidRequest, 887_412);
+    let rate_limit_exceeded = Message::new_response(Response::RateLimitExceeded, 887_412);
+    let internal_server_error = Message::new_response(Response::InternalServerError, 887_412);
+    let stalling = Message::new_response(Response::Stalling, 887_412);
+    let fw_up_to_date = Message::new_response(Response::FirmwareUpToDate, 887_412);
+    let update_available =
+        Message::new_response(Response::UpdateAvailable(Version::new(1, 2, 3)), 887_412);
+    let update_part = Message::new_response(
+        Response::UpdatePart(
+            b"ABCDEFGHIJKLMNOPQRSTUVXYZ0123456"
+                .repeat(1024)
+                .into_boxed_slice(),
+        ),
+        887_412,
+    );
+    let update_end = Message::new_response(Response::UpdateEnd, 887_412);
+    let settings = Message::new_response(
+        Response::Settings(Some(NodeSettings {
+            battery_ignore: false,
+            ota: true,
+            sleep_time: 60,
+            sbop: true,
+            mute_notifications: false,
+        })),
+        887_412,
+    );
 
     let requests = vec![
         pong,
         ok,
         reject,
+        invalid_request,
+        rate_limit_exceeded,
+        internal_server_error,
+        stalling,
         fw_up_to_date,
         update_available,
         update_part,
@@ -52,7 +67,9 @@ pub fn serialization() {
     let mut avg_postcard_time = Duration::from_secs(0);
 
     for msg in &requests {
-        let (bincode_size, bincode_time) = benchmark_serialize(msg, bincode::serialize);
+        let (bincode_size, bincode_time) = benchmark_serialize(msg, |val| {
+            bincode::serde::encode_to_vec(val, bincode::config::legacy())
+        });
         avg_bincode_size += bincode_size;
         avg_bincode_time += bincode_time;
 
@@ -110,8 +127,10 @@ pub fn deserialization() {
     let mut avg_postcard_time = Duration::from_secs(0);
 
     for msg in &requests {
-        let raw = bincode::serialize(msg).unwrap();
-        let bincode_time = benchmark_deserialize(&raw, bincode::deserialize::<Message>);
+        let raw = bincode::serde::encode_to_vec(msg, bincode::config::legacy()).unwrap();
+        let bincode_time = benchmark_deserialize(&raw, |raw| {
+            bincode::serde::decode_from_slice::<Message, _>(raw, bincode::config::legacy())
+        });
         avg_bincode_time += bincode_time;
 
         let raw = rmp_serde::to_vec(&msg).unwrap();
