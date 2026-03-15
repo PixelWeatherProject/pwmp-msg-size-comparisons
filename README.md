@@ -12,9 +12,9 @@ This repo contains the code used to benchmark different serialization formats th
 ### Test on PC
 |                         | bincode 2.0.1 | rmp-serde 1.3.1 | postcard 1.1.3 |
 | ----------------------- | ------------- | --------------- | -------------- |
-| Avg. Serialized size    | 2064 bytes    | 2075 bytes      | 2056 bytes     |
-| Avg. Serialization time | 2.597µs       | 5.5455µs        | 1.929µs        |
-| Deserialization time    | 2.597µs       | 6.7445µs        | 0.915µs        |
+| Avg. Serialized size    | 1384          | 1399            | 1376 bytes     |
+| Avg. Serialization time | 2.325µs       | 4.155µs         | 2.291µs        |
+| Deserialization time    | 2.836µs       | 5.276µs         | 2.688µs        |
 
 Postcard and bincode seem to perform the best. Postcard serializes to a much smaller number of bytes. This isn't really visible in the table due to the large size of the `UpdatePart` message. With almost all message types, Postcard produces 40-75% less bytes on average.
 
@@ -25,93 +25,88 @@ Postcard and bincode seem to perform the best. Postcard serializes to a much sma
   ```
   Serialization:
   --------------------
-  Bincode: 18 bytes, took 3.562µs
-  Msgpack: 34 bytes, took 2.375µs
-  Postcard: 12 bytes, took 1.187µs
+  Bincode: 18 bytes, took 1.187µs
+  Msgpack: 34 bytes, took 1.187µs
+  Postcard: 12 bytes, took 10.686µs
   --------------------
   --------------------
-  Bincode: 20 bytes, took 1.187µs
+  Bincode: 20 bytes, took 2.374µs
   Msgpack: 38 bytes, took 1.187µs
-  Postcard: 15 bytes, took 2.374µs
+  Postcard: 15 bytes, took 1.187µs
   --------------------
   --------------------
-  Bincode: 57 bytes, took 1.187µs
-  Msgpack: 68 bytes, took 1.187µs
-  Postcard: 44 bytes, took 2.374µs
+  Bincode: 57 bytes, took 3.562µs
+  Msgpack: 68 bytes, took 1.188µs
+  Postcard: 44 bytes, took 1.187µs
   --------------------
   --------------------
   Bincode: 60 bytes, took 1.187µs
-  Msgpack: 75 bytes, took 1.188µs
-  Postcard: 47 bytes, took 1.187µs
+  Msgpack: 75 bytes, took 1.187µs
+  Postcard: 47 bytes, took 1.188µs
   --------------------
   --------------------
-  Bincode: 12 bytes, took 1.187µs
-  Msgpack: 27 bytes, took 2.375µs
-  Postcard: 6 bytes, took 2.375µs
+  Bincode: 12 bytes, took 1.188µs
+  Msgpack: 27 bytes, took 1.187µs
+  Postcard: 6 bytes, took 1.187µs
   --------------------
   --------------------
   Bincode: 15 bytes, took 1.188µs
-  Msgpack: 32 bytes, took 1.187µs
+  Msgpack: 32 bytes, took 1.188µs
   Postcard: 9 bytes, took 1.187µs
   --------------------
   --------------------
   Bincode: 20 bytes, took 1.187µs
-  Msgpack: 35 bytes, took 1.188µs
-  Postcard: 8 bytes, took 1.187µs
+  Msgpack: 35 bytes, took 1.187µs
+  Postcard: 8 bytes, took 1.188µs
   --------------------
   --------------------
   Bincode: 13 bytes, took 1.187µs
   Msgpack: 38 bytes, took 1.187µs
-  Postcard: 7 bytes, took 2.375µs
+  Postcard: 7 bytes, took 1.188µs
   --------------------
   --------------------
-  Bincode: 12 bytes, took 1.188µs
+  Bincode: 12 bytes, took 1.187µs
   Msgpack: 19 bytes, took 1.187µs
-  Postcard: 6 bytes, took 1.187µs
+  Postcard: 6 bytes, took 0ns
   --------------------
 
   SUMMARY (requests):
   --------------------
-  Avg Bincode: 25 bytes, time: 1.451µs
-  Avg Msgpack: 40 bytes, time: 1.451µs
-  Avg Postcard: 17 bytes, time: 1.714µs
+  Avg Bincode: 25 bytes, time: 1.583µs
+  Avg Msgpack: 40 bytes, time: 1.187µs
+  Avg Postcard: 17 bytes, time: 2.11µs
   --------------------
   -------------------------
 
   Deserialization:
   --------------------
-  Bincode: took 1.187µs
+  Bincode: took 2.375µs
   Msgpack: took 2.374µs
   Postcard: took 1.187µs
   --------------------
   --------------------
   Bincode: took 1.187µs
-  Msgpack: took 1.188µs
+  Msgpack: took 1.187µs
+  Postcard: took 1.187µs
+  --------------------
+  --------------------
+  Bincode: took 1.188µs
+  Msgpack: took 1.187µs
+  Postcard: took 2.374µs
+  --------------------
+  --------------------
+  Bincode: took 1.187µs
+  Msgpack: took 1.187µs
   Postcard: took 1.188µs
   --------------------
   --------------------
   Bincode: took 1.187µs
-  Msgpack: took 2.374µs
-  Postcard: took 1.187µs
+  Msgpack: took 1.187µs
+  Postcard: took 1.188µs
   --------------------
   --------------------
-  Bincode: took 1.187µs
+  Bincode: took 1.188µs
   Msgpack: took 2.375µs
-  Postcard: took 1.188µs
-  --------------------
-  --------------------
-  Bincode: took 1.187µs
-  Msgpack: took 1.187µs
-  Postcard: took 1.188µs
-  --------------------
-  --------------------
-  Bincode: took 1.187µs
-  Msgpack: took 1.187µs
-  Postcard: took 1.188µs
-  --------------------
-  --------------------
-  Bincode: took 1.188µs
-  Msgpack: took 1.187µs
   Postcard: took 1.187µs
   --------------------
   --------------------
@@ -121,27 +116,32 @@ Postcard and bincode seem to perform the best. Postcard serializes to a much sma
   --------------------
   --------------------
   Bincode: took 1.187µs
-  Msgpack: took 1.188µs
+  Msgpack: took 1.187µs
   Postcard: took 1.187µs
+  --------------------
+  --------------------
+  Bincode: took 1.187µs
+  Msgpack: took 1.187µs
+  Postcard: took 1.188µs
   --------------------
 
   SUMMARY (requests):
   --------------------
-  Avg Bincode: time: 1.187µs
-  Avg Msgpack: time: 1.583µs
-  Avg Postcard: time: 1.187µs
+  Avg Bincode: time: 1.319µs
+  Avg Msgpack: time: 1.45µs
+  Avg Postcard: time: 1.319µs
   --------------------
   -------------------------
   Serialization:
   --------------------
-  Bincode: 12 bytes, took 1.188µs
-  Msgpack: 21 bytes, took 2.375µs
-  Postcard: 5 bytes, took 1.187µs
+  Bincode: 12 bytes, took 1.187µs
+  Msgpack: 21 bytes, took 1.188µs
+  Postcard: 5 bytes, took 2.375µs
   --------------------
   --------------------
   Bincode: 12 bytes, took 1.187µs
-  Msgpack: 19 bytes, took 1.187µs
-  Postcard: 5 bytes, took 1.188µs
+  Msgpack: 19 bytes, took 1.188µs
+  Postcard: 5 bytes, took 1.187µs
   --------------------
   --------------------
   Bincode: 12 bytes, took 1.187µs
@@ -149,84 +149,74 @@ Postcard and bincode seem to perform the best. Postcard serializes to a much sma
   Postcard: 5 bytes, took 1.187µs
   --------------------
   --------------------
-  Bincode: 12 bytes, took 0ns
-  Msgpack: 31 bytes, took 2.375µs
-  Postcard: 5 bytes, took 1.187µs
-  --------------------
-  --------------------
   Bincode: 12 bytes, took 1.187µs
-  Msgpack: 34 bytes, took 1.188µs
-  Postcard: 5 bytes, took 1.187µs
+  Msgpack: 31 bytes, took 1.187µs
+  Postcard: 5 bytes, took 1.188µs
   --------------------
   --------------------
-  Bincode: 12 bytes, took 0ns
-  Msgpack: 36 bytes, took 1.188µs
+  Bincode: 12 bytes, took 1.188µs
+  Msgpack: 34 bytes, took 1.187µs
+  Postcard: 5 bytes, took 1.188µs
+  --------------------
+  --------------------
+  Bincode: 12 bytes, took 1.188µs
+  Msgpack: 36 bytes, took 2.374µs
   Postcard: 5 bytes, took 1.187µs
   --------------------
   --------------------
   Bincode: 12 bytes, took 1.187µs
   Msgpack: 25 bytes, took 1.187µs
-  Postcard: 5 bytes, took 1.188µs
+  Postcard: 5 bytes, took 1.187µs
   --------------------
   --------------------
-  Bincode: 12 bytes, took 2.374µs
+  Bincode: 12 bytes, took 1.188µs
   Msgpack: 33 bytes, took 1.187µs
-  Postcard: 5 bytes, took 1.188µs
+  Postcard: 5 bytes, took 1.187µs
   --------------------
   --------------------
-  Bincode: 15 bytes, took 1.188µs
-  Msgpack: 37 bytes, took 1.187µs
+  Bincode: 15 bytes, took 2.374µs
+  Msgpack: 37 bytes, took 1.188µs
   Postcard: 8 bytes, took 1.187µs
   --------------------
   --------------------
-  Bincode: 32788 bytes, took 23.747µs
-  Msgpack: 32799 bytes, took 62.928µs
-  Postcard: 32776 bytes, took 16.623µs
+  Bincode: 32788 bytes, took 22.559µs
+  Msgpack: 32799 bytes, took 68.864µs
+  Postcard: 32776 bytes, took 15.435µs
   --------------------
   --------------------
-  Bincode: 12 bytes, took 1.187µs
+  Bincode: 12 bytes, took 1.188µs
   Msgpack: 26 bytes, took 1.187µs
-  Postcard: 5 bytes, took 1.188µs
+  Postcard: 5 bytes, took 1.187µs
   --------------------
   --------------------
-  Bincode: 19 bytes, took 0ns
-  Msgpack: 32 bytes, took 1.187µs
+  Bincode: 19 bytes, took 1.188µs
+  Msgpack: 32 bytes, took 2.374µs
   Postcard: 11 bytes, took 1.187µs
   --------------------
 
   SUMMARY (responses):
   --------------------
-  Avg Bincode: 2744 bytes, time: 2.869µs
-  Avg Msgpack: 2759 bytes, time: 6.629µs
+  Avg Bincode: 2744 bytes, time: 3.067µs
+  Avg Msgpack: 2759 bytes, time: 7.123µs
   Avg Postcard: 2736 bytes, time: 2.473µs
   --------------------
   -------------------------
 
   Deserialization:
   --------------------
-  Bincode: took 1.187µs
+  Bincode: took 1.188µs
   Msgpack: took 2.374µs
   Postcard: took 1.187µs
   --------------------
   --------------------
-  Bincode: took 1.188µs
-  Msgpack: took 1.187µs
+  Bincode: took 1.187µs
+  Msgpack: took 0ns
   Postcard: took 1.187µs
   --------------------
   --------------------
   Bincode: took 1.187µs
-  Msgpack: took 1.187µs
-  Postcard: took 1.187µs
-  --------------------
-  --------------------
-  Bincode: took 1.187µs
-  Msgpack: took 2.375µs
+  Msgpack: took 1.188µs
   Postcard: took 1.188µs
-  --------------------
-  --------------------
-  Bincode: took 1.187µs
-  Msgpack: took 1.187µs
-  Postcard: took 1.187µs
   --------------------
   --------------------
   Bincode: took 1.188µs
@@ -234,9 +224,19 @@ Postcard and bincode seem to perform the best. Postcard serializes to a much sma
   Postcard: took 1.188µs
   --------------------
   --------------------
-  Bincode: took 1.188µs
-  Msgpack: took 1.188µs
+  Bincode: took 0ns
+  Msgpack: took 1.187µs
   Postcard: took 1.187µs
+  --------------------
+  --------------------
+  Bincode: took 1.188µs
+  Msgpack: took 1.187µs
+  Postcard: took 1.187µs
+  --------------------
+  --------------------
+  Bincode: took 1.188µs
+  Msgpack: took 1.187µs
+  Postcard: took 2.374µs
   --------------------
   --------------------
   Bincode: took 1.187µs
@@ -245,30 +245,30 @@ Postcard and bincode seem to perform the best. Postcard serializes to a much sma
   --------------------
   --------------------
   Bincode: took 1.187µs
-  Msgpack: took 1.188µs
+  Msgpack: took 1.187µs
   Postcard: took 0ns
   --------------------
   --------------------
-  Bincode: took 36.807µs
-  Msgpack: took 85.487µs
+  Bincode: took 40.369µs
+  Msgpack: took 96.172µs
   Postcard: took 35.619µs
   --------------------
   --------------------
   Bincode: took 1.187µs
-  Msgpack: took 1.187µs
-  Postcard: took 1.188µs
+  Msgpack: took 1.188µs
+  Postcard: took 1.187µs
   --------------------
   --------------------
-  Bincode: took 1.188µs
+  Bincode: took 1.187µs
   Msgpack: took 1.187µs
   Postcard: took 1.188µs
   --------------------
 
   SUMMARY (responses):
   --------------------
-  Avg Bincode: time: 4.155µs
-  Avg Msgpack: time: 8.41µs
-  Avg Postcard: time: 3.957µs
+  Avg Bincode: time: 4.353µs
+  Avg Msgpack: time: 9.102µs
+  Avg Postcard: time: 4.056µs
   --------------------
   ```
 </details>
