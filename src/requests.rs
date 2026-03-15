@@ -54,7 +54,7 @@ fn build_requests() -> Vec<Message> {
     requests
 }
 
-pub fn serialization() {
+pub fn serialization() -> Vec<(usize, Duration)> {
     let requests = build_requests();
 
     let mut avg_bincode_size = 0;
@@ -82,13 +82,9 @@ pub fn serialization() {
         avg_postcard_time += postcard_time;
 
         println!("{}", "-".repeat(20));
-        println!("Message: {msg:?}");
-        println!("Bincode: {} bytes, took {:?}", bincode_size, bincode_time);
-        println!("Msgpack: {} bytes, took {:?}", msgpack_size, msgpack_time);
-        println!(
-            "Postcard: {} bytes, took {:?}",
-            postcard_size, postcard_time
-        );
+        println!("Bincode: {bincode_size} bytes, took {bincode_time:?}");
+        println!("Msgpack: {msgpack_size} bytes, took {msgpack_time:?}");
+        println!("Postcard: {postcard_size} bytes, took {postcard_time:?}");
         println!("{}", "-".repeat(20));
     }
 
@@ -99,24 +95,21 @@ pub fn serialization() {
     avg_postcard_size /= requests.len();
     avg_postcard_time /= requests.len() as u32;
 
-    println!("\nSUMMARY:");
+    println!("\nSUMMARY (requests):");
     println!("{}", "-".repeat(20));
-    println!(
-        "Avg Bincode: {} bytes, time: {:?}",
-        avg_bincode_size, avg_bincode_time
-    );
-    println!(
-        "Avg Msgpack: {} bytes, time: {:?}",
-        avg_msgpack_size, avg_msgpack_time
-    );
-    println!(
-        "Avg Postcard: {} bytes, time: {:?}",
-        avg_postcard_size, avg_postcard_time
-    );
+    println!("Avg Bincode: {avg_bincode_size} bytes, time: {avg_bincode_time:?}");
+    println!("Avg Msgpack: {avg_msgpack_size} bytes, time: {avg_msgpack_time:?}");
+    println!("Avg Postcard: {avg_postcard_size} bytes, time: {avg_postcard_time:?}");
     println!("{}", "-".repeat(20));
+
+    vec![
+        (avg_bincode_size, avg_bincode_time),
+        (avg_msgpack_size, avg_msgpack_time),
+        (avg_postcard_size, avg_postcard_time),
+    ]
 }
 
-pub fn deserialization() {
+pub fn deserialization() -> Vec<Duration> {
     let requests = build_requests();
 
     let mut avg_bincode_time = Duration::from_secs(0);
@@ -139,9 +132,9 @@ pub fn deserialization() {
         avg_postcard_time += postcard_time;
 
         println!("{}", "-".repeat(20));
-        println!("Bincode: took {:?}", bincode_time);
-        println!("Msgpack: took {:?}", msgpack_time);
-        println!("Postcard: took {:?}", postcard_time);
+        println!("Bincode: took {bincode_time:?}");
+        println!("Msgpack: took {msgpack_time:?}");
+        println!("Postcard: took {postcard_time:?}");
         println!("{}", "-".repeat(20));
     }
 
@@ -149,12 +142,14 @@ pub fn deserialization() {
     avg_msgpack_time /= requests.len() as u32;
     avg_postcard_time /= requests.len() as u32;
 
-    println!("\nSUMMARY:");
+    println!("\nSUMMARY (requests):");
     println!("{}", "-".repeat(20));
-    println!("Avg Bincode: time: {:?}", avg_bincode_time);
-    println!("Avg Msgpack: time: {:?}", avg_msgpack_time);
-    println!("Avg Postcard: time: {:?}", avg_postcard_time);
+    println!("Avg Bincode: time: {avg_bincode_time:?}");
+    println!("Avg Msgpack: time: {avg_msgpack_time:?}");
+    println!("Avg Postcard: time: {avg_postcard_time:?}");
     println!("{}", "-".repeat(20));
+
+    vec![avg_bincode_time, avg_msgpack_time, avg_postcard_time]
 }
 
 fn benchmark_serialize<T, S, E>(what: &T, serializer: S) -> (usize, Duration)
