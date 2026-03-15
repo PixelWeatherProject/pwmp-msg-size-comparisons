@@ -17,7 +17,11 @@ fn build_responses() -> Vec<Message> {
     let update_available =
         Message::new_response(Response::UpdateAvailable(Version::new(1, 2, 3)), 887_412);
     let update_part = Message::new_response(
-        Response::UpdatePart(b"A".to_vec().into_boxed_slice()),
+        Response::UpdatePart(
+            b"ABCDEFGHIJKLMNOPQRSTUVXYZ0123456"
+                .repeat(1024)
+                .into_boxed_slice(),
+        ),
         887_412,
     );
     let update_end = Message::new_response(Response::UpdateEnd, 887_412);
